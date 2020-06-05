@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>Kiddo math machine</title>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+ 
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <!-- CSS -->
+    <link href="static/css/style.css" rel="stylesheet">
+</head>
+  <body class="text-center">
+    {% block content%} {% endblock %} 
+ 
+    <script src="static/js/jquery-3.4.1.min.js"></script>
+    <script src="static/js/index.js"></script>
+    <!-- AJAX optional -->
+    <script type="text/javascript">
+        $("#myButton").click(function(){
+            $('#result').text('Predicting ...');
+            var $SCRIPT_ROOT = {{request.script_root|tojson|safe}};
+
+            var leftCanvas = document.querySelector("#left_canvas");
+            var middleCanvas = document.querySelector("#middle_canvas");
+            var rightCanvas= document.querySelector("#right_canvas");
+
+            var leftImage = leftCanvas.toDataURL('image/jpeg');
+            var middleImage = middleCanvas.toDataURL('image/jpeg');
+            var RightImage = rightCanvas.toDataURL('image/jpeg');
+
+            console.log('Still loading');
+
+            // var loadingTimeout = window.setTimeout(function () {
+            //         // show your warning here
+            //         alert('Still loading :P');
+            //         console.log('Still loading :P');
+            //     }, 100000);
+
+            $.ajax({
+                type: "POST",
+                url: $SCRIPT_ROOT + "/upload/",
+                data: JSON.stringify({'images': [leftImage, middleImage, RightImage]}),
+                contentType: "application/json",
+                dataType: 'text',
+                success: function(data){
+                    // window.clearTimeout(loadingTimeout);
+                    // console.log('Success:', data);
+                    console.log(typeof(data));
+                    $('#result').text(data);
+                },
+                complete: function (xhr, status) {
+                    // status is either "success" or "error"
+                    // complete is fired after success or error functions
+                    // xhr is the xhr object itself
+
+                    var header = xhr.getResponseHeader('Content-Type');
+                },
+                error: function(err) {
+                    console.log(err);  
+                },
+                // timeout: 10000
+            });
+        });
+    </script>
+  </body>
+</html>
